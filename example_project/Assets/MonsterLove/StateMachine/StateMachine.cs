@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) 2016 Made With Monster Love (Pty) Ltd
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -46,6 +46,8 @@ namespace MonsterLove.StateMachine
 
 	public class StateMachine<T> : IStateMachine where T : struct, IConvertible, IComparable
 	{
+		public static bool IncludeInherited = true;
+
 		public event Action<T> Changed;
 
 		private StateMachineRunner engine;
@@ -82,8 +84,9 @@ namespace MonsterLove.StateMachine
 			}
 
 			//Reflect methods
-			var methods = component.GetType().GetMethods(BindingFlags.Instance | BindingFlags.DeclaredOnly | BindingFlags.Public |
-									  BindingFlags.NonPublic);
+			BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+			if (!IncludeInherited) bindingFlags = bindingFlags | BindingFlags.DeclaredOnly;
+			var methods = component.GetType().GetMethods(bindingFlags);
 
 			//Bind methods to states
 			var separator = "_".ToCharArray();
